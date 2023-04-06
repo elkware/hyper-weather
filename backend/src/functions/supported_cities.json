@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Novi Sad",
+        "country": "Serbia",
+        "lat": 45.25,
+        "lon": 19.85
+    },
+    {
+        "name": "Belgrade",
+        "country": "Serbia",
+        "lat": 44.82,
+        "lon": 20.47
+    },
+    {
+        "name": "London",
+        "country": "United Kingdom",
+        "lat": 51.51,
+        "lon": -0.13
+    },
+    {
+        "name": "Budapest",
+        "country": "Hungary",
+        "lat": 47.5,
+        "lon": 19.08
+    },
+    {
+        "name": "Amsterdam",
+        "country": "Netherlands",
+        "lat": 52.37,
+        "lon": 4.9
+    }
+]
