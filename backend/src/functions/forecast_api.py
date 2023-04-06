@@ -3,6 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from collections.abc import Mapping, Iterable
 from decimal import Decimal
+from datetime import datetime
 
 
 table = boto3.resource('dynamodb').Table('hyperweather_data')
@@ -27,22 +28,26 @@ def lambda_handler(event, context):
     if not query_string:
         return {
             'statusCode': 400,
-            'body': 'Missing location parameter'
+            'body': 'Missing mandatory location query parameter'
         }
     location = query_string.get('location')
     if not location:
         return {
             'statusCode': 400,
-            'body': 'Missing location parameter'
+            'body': 'Missing mandatory location query parameter'
         }
-    location = location.replace(' ', '_').replace(',', '').lower()
-    forecast = get_forecast_for_city(location)
+
+    forecast = get_forecast_for_city(location.replace(' ', '_').replace(',', '').lower())
     if not forecast:
         return {
             'statusCode': 404,
             'body': 'No forecast found for location'
         }
 
+    from_current_timestamp = query_string.get('from_current_timestamp')
+    if from_current_timestamp and from_current_timestamp.lower() == 'true':
+        from_timestamp = datetime.now().timestamp()
+        forecast = [item for item in forecast if float(item['timestamp']) >= from_timestamp]
 
     return {
         'statusCode': 200,
@@ -61,4 +66,4 @@ def get_forecast_for_city(location):
     response = table.query(
         KeyConditionExpression=Key('location').eq(location),
     )
-    return response['Items']
+    return response.get('Items')
