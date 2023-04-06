@@ -1,64 +1,108 @@
-import json
+import urllib3
 import boto3
-from boto3.dynamodb.conditions import Key
-from collections.abc import Mapping, Iterable
+import json
+from datetime import datetime
 from decimal import Decimal
 
 
-table = boto3.resource('dynamodb').Table('hyperweather_data')
+http = urllib3.PoolManager()
 
-
-class DecimalEncoder(json.JSONEncoder):
-    def encode(self, obj):
-        if isinstance(obj, Mapping):
-            return '{' + ', '.join(f'{self.encode(k)}: {self.encode(v)}' for (k, v) in obj.items()) + '}'
-        if isinstance(obj, Iterable) and (not isinstance(obj, str)):
-            return '[' + ', '.join(map(self.encode, obj)) + ']'
-        if isinstance(obj, Decimal):
-            return f'{obj.normalize():f}'  # using normalize() gets rid of trailing 0s, using ':f' prevents scientific notation
-        return super().encode(obj)
-    
 
 def lambda_handler(event, context):
     """
-    Lambda handler to handle the forecast api through API Gateway
+    Lambda handler
     """
-    query_string = event['queryStringParameters']
-    if not query_string:
-        return {
-            'statusCode': 400,
-            'body': 'Missing location parameter'
-        }
-    location = query_string.get('location')
-    if not location:
-        return {
-            'statusCode': 400,
-            'body': 'Missing location parameter'
-        }
-    location = location.replace(' ', '_').replace(',', '').lower()
-    forecast = get_forecast_for_city(location)
-    if not forecast:
-        return {
-            'statusCode': 404,
-            'body': 'No forecast found for location'
-        }
-
-
+    data = retrieve_weather_data()
+    save_met_no_data(data)
     return {
         'statusCode': 200,
-        'body': json.dumps(forecast, cls=DecimalEncoder),
-        'headers': {
-            'Content-Type': 'application/json'
-        }
+        'body': json.dumps('Data fetched and saved')
     }
 
 
-def get_forecast_for_city(location):
+def retrieve_weather_data():
     """
-    Get the forecast for a city
-    """
+    Retrieve the weather data from the met.no api and format it for dynamodb.
 
-    response = table.query(
-        KeyConditionExpression=Key('location').eq(location),
-    )
-    return response['Items']
+    Returns:
+        list: A genertor of weather data items per city
+    """
+    for city in json.load(open('supported_cities.json', 'r')):
+        try:
+            data = json.loads(http.request(
+                method='GET',
+                url=f'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={city["lat"]}&lon={city["lon"]}', 
+                headers={'User-Agent': 'HyperWeather/0.1 github.com/elkware/hyper-weather'}
+            ).data.decode('utf-8'), parse_float=Decimal)
+        except Exception as e:
+            print(e)
+            continue
+        items = []
+        for time_point in data['properties']['timeseries']:
+            details = time_point['data']['instant']['details']
+            details['location'] = city['name'].replace(' ',  '_').lower() + '_' + city['country'].replace(' ',  '_').lower()
+            details['timestamp'] = Decimal(datetime.fromisoformat(time_point['time'].replace('Z', '+00:00')).timestamp())
+            next_details = time_point['data'].get('next_1_hours') or time_point['data'].get('next_6_hours') or time_point['data'].get('next_12_hours')
+            if next_details:
+                details['precipitation_amount'] = next_details['details']['precipitation_amount']
+                details['symbol_code'] = next_details['summary']['symbol_code']
+            else:
+                details['precipitation_amount'] = items[-1]['precipitation_amount']
+                details['symbol_code'] = items[-1]['symbol_code']
+            items.append(details)
+        yield items
+
+
+def get_or_create_dynamodb_table():
+    """
+    Get or create the dynamodb table
+    """
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('hyperweather_data')
+    try:
+        table.load()
+    except Exception as e:
+        print(e)
+        table = dynamodb.create_table(
+            TableName='hyperweather_data',
+            KeySchema=[
+                {
+                    'AttributeName': 'location',
+                    'KeyType': 'HASH'
+                },
+                {
+                    'AttributeName': 'timestamp',
+                    'KeyType': 'RANGE'
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'location',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'timestamp',
+                    'AttributeType': 'N'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 5,
+                'WriteCapacityUnits': 5
+            }
+        )
+        table.meta.client.get_waiter('table_exists').wait(TableName='hyperweather_data')
+    return table
+
+
+def save_met_no_data(data):
+    """
+    Save the data to the dynamodb table
+    """
+    table = get_or_create_dynamodb_table()
+    for city_data in data:
+        with table.batch_writer() as batch:
+            for item in city_data:
+                batch.put_item(
+                    Item=item
+                )
+
