@@ -177,10 +177,12 @@ Popup
   text-decoration: none;
   color: #f1f1f1;
 }
+
 .popup .close:hover {
   cursor: pointer;
   color: #666;
 }
+
 .popup .content {
   max-height: 30%;
   overflow: auto;

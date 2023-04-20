@@ -3,7 +3,8 @@ import boto3
 
 
 table = boto3.resource("dynamodb").Table("hyperweather_location_report_data")
-s3 = boto3.client('s3')
+s3 = boto3.client("s3")
+
 
 def lambda_handler(event, context):
     """
@@ -27,20 +28,17 @@ def lambda_handler(event, context):
     summary = item.get("Item")
     if not summary:
         return {"statusCode": 404, "body": f"No forecast summary for {location}"}
-    
+
     try:
         url = s3.generate_presigned_url(
-            ClientMethod='get_object',
-            Params={
-                'Bucket': 'hyperweather-tts',
-                'Key': f'{summary["date"]}/{summary["location"]}.mp3'
-            },
-            ExpiresIn=3600  # The URL will expire in 1 hour (3600 seconds)
+            ClientMethod="get_object",
+            Params={"Bucket": "hyperweather-tts", "Key": f'{summary["date"]}/{summary["location"]}.mp3'},
+            ExpiresIn=3600,  # The URL will expire in 1 hour (3600 seconds)
         )
-        summary['report_tts_url'] = url
+        summary["report_tts_url"] = url
     except Exception as e:
         print(e)
-        
+
     return {
         "statusCode": 200,
         "body": json.dumps(summary),

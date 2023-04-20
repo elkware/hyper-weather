@@ -7,7 +7,11 @@ s3_client = boto3.client("s3")
 
 def call_polly_and_save_to_s3(location, date, text):
     response = polly_client.synthesize_speech(
-        Text=f'<speak><amazon:domain name="news">{text}</amazon:domain></speak>', OutputFormat="mp3", VoiceId="Amy", TextType="ssml", Engine="neural"
+        Text=f'<speak><amazon:domain name="news">{text}</amazon:domain></speak>',
+        OutputFormat="mp3",
+        VoiceId="Amy",
+        TextType="ssml",
+        Engine="neural",
     )
     s3_client.put_object(
         Body=response["AudioStream"].read(),
