@@ -37,17 +37,13 @@ def lambda_handler(event, context):
             'body': 'Missing mandatory location query parameter'
         }
 
-    forecast = get_forecast_for_city(location.replace(' ', '_').replace(',', '').lower())
+    from_current_timestamp = True if query_string.get('from_current_timestamp') and query_string['from_current_timestamp'].lower() == 'true' else False
+    forecast = get_forecast_for_city(location.replace(' ', '_').replace(',', '').lower(), from_current_timestamp)
     if not forecast:
         return {
             'statusCode': 404,
             'body': 'No forecast found for location'
         }
-
-    from_current_timestamp = query_string.get('from_current_timestamp')
-    if from_current_timestamp and from_current_timestamp.lower() == 'true':
-        from_timestamp = datetime.now().timestamp()
-        forecast = [item for item in forecast if float(item['timestamp']) >= from_timestamp]
 
     return {
         'statusCode': 200,
@@ -58,12 +54,16 @@ def lambda_handler(event, context):
     }
 
 
-def get_forecast_for_city(location):
+def get_forecast_for_city(location, from_current_timestamp):
     """
     Get the forecast for a city
     """
 
+    key_condition_expression = Key('location').eq(location)
+    if from_current_timestamp:
+        from_timestamp = datetime.now().timestamp()
+        key_condition_expression = key_condition_expression & Key('timestamp').gte(Decimal(from_timestamp))
     response = table.query(
-        KeyConditionExpression=Key('location').eq(location),
+        KeyConditionExpression=key_condition_expression
     )
     return response.get('Items')
