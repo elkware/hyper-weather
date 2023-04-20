@@ -125,7 +125,7 @@ function Weather({ weather, todaySummary }: { weather: any, todaySummary: any })
     }
 
     const getDayOfWeek = (date: Date) => {
-        var dayOfWeek = new Date(date).getDay();
+        const dayOfWeek = new Date(date).getDay();
         return isNaN(dayOfWeek) ? null :
             ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
     }

@@ -1,0 +1,869 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Metadata:
+    Generator: "former2"
+Description: ""
+Resources:
+    LambdaFunction:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Description: ""
+            FunctionName: "met_no_fetcher"
+            Handler: "weather_fetcher.lambda_handler"
+            Architectures: 
+              - "arm64"
+            Code: 
+                S3Bucket: !Sub "awslambda-${AWS::Region}-tasks"
+                S3Key: !Sub "/snapshots/${AWS::AccountId}/met_no_fetcher-523fc5aa-ef6d-49c7-a2b9-82038391e0d8"
+                S3ObjectVersion: "edDRf2MKdIntsYs0CMX.FrB4Dz82XZL."
+            MemorySize: 128
+            Role: !GetAtt IAMRole4.Arn
+            Runtime: "python3.9"
+            Timeout: 60
+            TracingConfig: 
+                Mode: "PassThrough"
+            EphemeralStorage: 
+                Size: 512
+
+    LambdaFunction2:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Description: ""
+            FunctionName: "LocationsAPI"
+            Handler: "lambda_function.lambda_handler"
+            Architectures: 
+              - "arm64"
+            Code: 
+                S3Bucket: !Sub "awslambda-${AWS::Region}-tasks"
+                S3Key: !Sub "/snapshots/${AWS::AccountId}/LocationsAPI-b149b1cb-acf2-457e-9e88-6c0f2788a568"
+                S3ObjectVersion: "DbTndwgi_wNS5Um3Yeb0H3CwKgBfIjvH"
+            MemorySize: 128
+            Role: !GetAtt IAMRole2.Arn
+            Runtime: "python3.9"
+            Timeout: 3
+            TracingConfig: 
+                Mode: "PassThrough"
+            EphemeralStorage: 
+                Size: 512
+
+    LambdaFunction3:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Description: ""
+            FunctionName: "ForecastAPI"
+            Handler: "lambda_function.lambda_handler"
+            Architectures: 
+              - "arm64"
+            Code: 
+                S3Bucket: !Sub "awslambda-${AWS::Region}-tasks"
+                S3Key: !Sub "/snapshots/${AWS::AccountId}/ForecastAPI-ab30ed9d-9d1c-423d-82d9-efea96d2ff01"
+                S3ObjectVersion: "nopK_V6ZtD893DIer_AowmjubOWPrs15"
+            MemorySize: 128
+            Role: !GetAtt IAMRole.Arn
+            Runtime: "python3.9"
+            Timeout: 60
+            TracingConfig: 
+                Mode: "PassThrough"
+            EphemeralStorage: 
+                Size: 512
+
+    LambdaFunction4:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Description: ""
+            FunctionName: "WeatherTTS"
+            Handler: "lambda_function.lambda_handler"
+            Architectures: 
+              - "arm64"
+            Code: 
+                S3Bucket: !Sub "awslambda-${AWS::Region}-tasks"
+                S3Key: !Sub "/snapshots/${AWS::AccountId}/WeatherTTS-055f19d6-ba78-4633-bf1d-52f2e3223aa7"
+                S3ObjectVersion: "sEmoVu2rv37thUbs1PqKA8HLx8RqN3No"
+            MemorySize: 128
+            Role: !GetAtt IAMRole5.Arn
+            Runtime: "python3.10"
+            Timeout: 300
+            TracingConfig: 
+                Mode: "PassThrough"
+            EphemeralStorage: 
+                Size: 512
+
+    LambdaFunction5:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Description: ""
+            FunctionName: "ForecastSummaryAPI"
+            Handler: "lambda_function.lambda_handler"
+            Architectures: 
+              - "arm64"
+            Code: 
+                S3Bucket: !Sub "awslambda-${AWS::Region}-tasks"
+                S3Key: !Sub "/snapshots/${AWS::AccountId}/ForecastSummaryAPI-99e998ea-262c-496c-a41a-6bbf6e381917"
+                S3ObjectVersion: "OmgJLMtlB64egZd2Bk0l_aWRB9jebYs_"
+            MemorySize: 128
+            Role: !GetAtt IAMRole3.Arn
+            Runtime: "python3.10"
+            Timeout: 3
+            TracingConfig: 
+                Mode: "PassThrough"
+            EphemeralStorage: 
+                Size: 512
+
+    LambdaFunction6:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Description: ""
+            Environment: 
+                Variables: 
+                    OPEN_AI_API_KEY: "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"
+            FunctionName: "weather_ai"
+            Handler: "lambda_function.lambda_handler"
+            Architectures: 
+              - "arm64"
+            Code: 
+                S3Bucket: !Sub "awslambda-${AWS::Region}-tasks"
+                S3Key: !Sub "/snapshots/${AWS::AccountId}/weather_ai-e98fa14b-4e6d-472e-afb0-a7e749705834"
+                S3ObjectVersion: "J0b4kGCh6uivoOrG46qmksP8UdFQXOs0"
+            MemorySize: 192
+            Role: !GetAtt IAMRole6.Arn
+            Runtime: "python3.10"
+            Timeout: 600
+            TracingConfig: 
+                Mode: "PassThrough"
+            EphemeralStorage: 
+                Size: 512
+
+    LambdaPermission:
+        Type: "AWS::Lambda::Permission"
+        Properties:
+            Action: "lambda:InvokeFunction"
+            FunctionName: !GetAtt LambdaFunction.Arn
+            Principal: "events.amazonaws.com"
+            SourceArn: !GetAtt EventsRule2.Arn
+
+    LambdaPermission2:
+        Type: "AWS::Lambda::Permission"
+        Properties:
+            Action: "lambda:InvokeFunction"
+            FunctionName: !GetAtt LambdaFunction3.Arn
+            Principal: !Sub "${ApiGatewayV2Stage}gateway.amazonaws.com"
+            SourceArn: !Sub "arn:aws:execute-${ApiGatewayV2Stage}:${AWS::Region}:${AWS::AccountId}:${ApiGatewayV2Api}/*/*/${LambdaFunction3}"
+
+    LambdaPermission3:
+        Type: "AWS::Lambda::Permission"
+        Properties:
+            Action: "lambda:InvokeFunction"
+            FunctionName: !GetAtt LambdaFunction3.Arn
+            Principal: !Sub "${ApiGatewayV2Stage}gateway.amazonaws.com"
+            SourceArn: !Sub "arn:aws:execute-${ApiGatewayV2Stage}:${AWS::Region}:${AWS::AccountId}:${ApiGatewayV2Api}/*/*/forecast"
+
+    LambdaPermission4:
+        Type: "AWS::Lambda::Permission"
+        Properties:
+            Action: "lambda:InvokeFunction"
+            FunctionName: !GetAtt LambdaFunction2.Arn
+            Principal: !Sub "${ApiGatewayV2Stage}gateway.amazonaws.com"
+            SourceArn: !Sub "arn:aws:execute-${ApiGatewayV2Stage}:${AWS::Region}:${AWS::AccountId}:${ApiGatewayV2Api}/*/*/locations"
+
+    LambdaPermission5:
+        Type: "AWS::Lambda::Permission"
+        Properties:
+            Action: "lambda:InvokeFunction"
+            FunctionName: !GetAtt LambdaFunction5.Arn
+            Principal: !Sub "${ApiGatewayV2Stage}gateway.amazonaws.com"
+            SourceArn: !Sub "arn:aws:execute-${ApiGatewayV2Stage}:${AWS::Region}:${AWS::AccountId}:${ApiGatewayV2Api}/*/*/summary"
+
+    LambdaPermission6:
+        Type: "AWS::Lambda::Permission"
+        Properties:
+            Action: "lambda:InvokeFunction"
+            FunctionName: !GetAtt LambdaFunction6.Arn
+            Principal: "events.amazonaws.com"
+            SourceArn: !GetAtt EventsRule.Arn
+
+    LambdaEventSourceMapping:
+        Type: "AWS::Lambda::EventSourceMapping"
+        Properties:
+            BatchSize: 1
+            EventSourceArn: !GetAtt DynamoDBTable.StreamArn
+            FunctionName: !GetAtt LambdaFunction4.Arn
+            Enabled: true
+            MaximumBatchingWindowInSeconds: 0
+            ParallelizationFactor: 1
+            MaximumRecordAgeInSeconds: -1
+            BisectBatchOnFunctionError: false
+            MaximumRetryAttempts: -1
+            TumblingWindowInSeconds: 0
+
+    S3Bucket:
+        Type: "AWS::S3::Bucket"
+        Properties:
+            BucketName: "app.wettr.xyz"
+            BucketEncryption: 
+                ServerSideEncryptionConfiguration: 
+                  - 
+                    ServerSideEncryptionByDefault: 
+                        SSEAlgorithm: "AES256"
+                    BucketKeyEnabled: true
+            WebsiteConfiguration: 
+                IndexDocument: "index.html"
+                ErrorDocument: "404.html"
+
+    S3Bucket2:
+        Type: "AWS::S3::Bucket"
+        Properties:
+            BucketName: "hyperweather-tts"
+            BucketEncryption: 
+                ServerSideEncryptionConfiguration: 
+                  - 
+                    ServerSideEncryptionByDefault: 
+                        SSEAlgorithm: "AES256"
+                    BucketKeyEnabled: true
+            CorsConfiguration: 
+                CorsRules: 
+                  - 
+                    AllowedHeaders: 
+                      - "*"
+                    AllowedMethods: 
+                      - "GET"
+                      - "PUT"
+                      - "POST"
+                    AllowedOrigins: 
+                      - "*"
+
+    S3BucketPolicy:
+        Type: "AWS::S3::BucketPolicy"
+        Properties:
+            Bucket: !Ref S3Bucket
+            PolicyDocument: 
+                Version: "2012-10-17"
+                Statement: 
+                  - 
+                    Sid: "AllowPublic"
+                    Effect: "Allow"
+                    Principal: "*"
+                    Action: "s3:GetObject"
+                    Resource: !Sub "arn:aws:s3:::${S3Bucket}/*"
+
+    CloudFrontDistribution:
+        Type: "AWS::CloudFront::Distribution"
+        Properties:
+            DistributionConfig: 
+                Aliases: 
+                  - !Ref S3Bucket
+                  - "wettr.xyz"
+                Origins: 
+                  - 
+                    ConnectionAttempts: 3
+                    ConnectionTimeout: 10
+                    CustomOriginConfig: 
+                        HTTPPort: 80
+                        HTTPSPort: 443
+                        OriginKeepaliveTimeout: 5
+                        OriginProtocolPolicy: "http-only"
+                        OriginReadTimeout: 30
+                        OriginSSLProtocols: 
+                          - "TLSv1.2"
+                    DomainName: !Sub "${S3Bucket}.s3-website-${AWS::Region}.amazonaws.com"
+                    Id: !Sub "${S3Bucket}.s3-website-${AWS::Region}.amazonaws.com"
+                    OriginPath: ""
+                DefaultCacheBehavior: 
+                    AllowedMethods: 
+                      - "HEAD"
+                      - "DELETE"
+                      - "POST"
+                      - "GET"
+                      - "OPTIONS"
+                      - "PUT"
+                      - "PATCH"
+                    CachedMethods: 
+                      - "HEAD"
+                      - "GET"
+                    Compress: true
+                    CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
+                    ResponseHeadersPolicyId: "5cc3b908-e619-4b99-88e5-2cf7f45965bd"
+                    SmoothStreaming: false
+                    TargetOriginId: !Sub "${S3Bucket}.s3-website-${AWS::Region}.amazonaws.com"
+                    ViewerProtocolPolicy: "redirect-to-https"
+                Comment: ""
+                PriceClass: "PriceClass_100"
+                Enabled: true
+                ViewerCertificate: 
+                    AcmCertificateArn: !Sub "arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/74d9c691-3022-4eb8-b5a3-74e1f09f0ee7"
+                    CloudFrontDefaultCertificate: false
+                    MinimumProtocolVersion: "TLSv1.2_2021"
+                    SslSupportMethod: "sni-only"
+                Restrictions: 
+                    GeoRestriction: 
+                        RestrictionType: "none"
+                HttpVersion: "http2"
+                DefaultRootObject: ""
+                IPV6Enabled: true
+
+    Route53HostedZone:
+        Type: "AWS::Route53::HostedZone"
+        Properties:
+            Name: !Ref Route53RecordSet
+
+    Route53RecordSet:
+        Type: "AWS::Route53::RecordSet"
+        Properties:
+            Name: !Ref Route53RecordSet2
+            Type: "A"
+            AliasTarget: 
+                HostedZoneId: "Z02376893KXF8X73K51HG"
+                DNSName: !Sub "${S3Bucket}."
+                EvaluateTargetHealth: true
+            HostedZoneId: "Z02376893KXF8X73K51HG"
+
+    Route53RecordSet2:
+        Type: "AWS::Route53::RecordSet"
+        Properties:
+            Name: !Ref Route53RecordSet3
+            Type: "NS"
+            TTL: 172800
+            ResourceRecords: 
+              - "ns-923.awsdns-51.net."
+              - "ns-54.awsdns-06.com."
+              - "ns-1816.awsdns-35.co.uk."
+              - "ns-1392.awsdns-46.org."
+            HostedZoneId: "Z02376893KXF8X73K51HG"
+
+    Route53RecordSet3:
+        Type: "AWS::Route53::RecordSet"
+        Properties:
+            Name: "wettr.xyz."
+            Type: "SOA"
+            TTL: 900
+            ResourceRecords: 
+              - "ns-923.awsdns-51.net. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+            HostedZoneId: "Z02376893KXF8X73K51HG"
+
+    Route53RecordSet4:
+        Type: "AWS::Route53::RecordSet"
+        Properties:
+            Name: !Sub "_d7d33bcf8f08a14fc002708f1cc047ce.${Route53RecordSet}"
+            Type: "CNAME"
+            TTL: 300
+            ResourceRecords: 
+              - "_754a6afbcb991793e2594b1e33b9fe2e.yygwskclfy.acm-validations.aws."
+            HostedZoneId: !Ref Route53HostedZone
+
+    Route53RecordSet5:
+        Type: "AWS::Route53::RecordSet"
+        Properties:
+            Name: !Sub "${ApiGatewayV2Stage}.${Route53RecordSet}"
+            Type: "A"
+            AliasTarget: 
+                HostedZoneId: "ZLY8HYME6SFDD"
+                DNSName: !Sub "d-ncah1t2vf5.execute-${ApiGatewayV2Stage}.${AWS::Region}.amazonaws.com."
+                EvaluateTargetHealth: true
+            HostedZoneId: !Ref Route53HostedZone
+
+    Route53RecordSet6:
+        Type: "AWS::Route53::RecordSet"
+        Properties:
+            Name: !Sub "_b23cc33128f7691c904119ae3d43c409.${ApiGatewayV2Stage}.${Route53RecordSet}"
+            Type: "CNAME"
+            TTL: 300
+            ResourceRecords: 
+              - "_ed5458da1e72f5e463959b1880695a89.yygwskclfy.acm-validations.aws."
+            HostedZoneId: !Ref Route53HostedZone
+
+    Route53RecordSet7:
+        Type: "AWS::Route53::RecordSet"
+        Properties:
+            Name: !Sub "${S3Bucket}."
+            Type: "A"
+            AliasTarget: 
+                HostedZoneId: "Z2FDTNDATAQYW2"
+                DNSName: !Sub "${CloudFrontDistribution.DomainName}."
+                EvaluateTargetHealth: false
+            HostedZoneId: !Ref Route53HostedZone
+
+    Route53RecordSet8:
+        Type: "AWS::Route53::RecordSet"
+        Properties:
+            Name: !Sub "_bfec1546f3ab70fc42235c96d27548f6.${S3Bucket}."
+            Type: "CNAME"
+            TTL: 300
+            ResourceRecords: 
+              - "_91b1d5760df2f660d90e37c327943125.yygwskclfy.acm-validations.aws."
+            HostedZoneId: !Ref Route53HostedZone
+
+    ApiGatewayV2Api:
+        Type: "AWS::ApiGatewayV2::Api"
+        Properties:
+            ApiKeySelectionExpression: !Sub "$request.header.x-${ApiGatewayV2Stage}-key"
+            Description: "Created by AWS Lambda"
+            ProtocolType: "HTTP"
+            RouteSelectionExpression: "$request.method $request.path"
+            CorsConfiguration: 
+                AllowOrigins: 
+                  - "*"
+            DisableExecuteApiEndpoint: false
+
+    ApiGatewayV2Stage:
+        Type: "AWS::ApiGatewayV2::Stage"
+        Properties:
+            StageName: "api"
+            StageVariables: {}
+            ApiId: "11ug737jt2"
+            DeploymentId: "25uics"
+            RouteSettings: {}
+            DefaultRouteSettings: 
+                DetailedMetricsEnabled: false
+            AutoDeploy: true
+
+    ApiGatewayV2Route:
+        Type: "AWS::ApiGatewayV2::Route"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ApiKeyRequired: false
+            AuthorizationType: "NONE"
+            RouteKey: "ANY /summary"
+            Target: !Sub "integrations/${ApiGatewayV2Integration}"
+
+    ApiGatewayV2Route2:
+        Type: "AWS::ApiGatewayV2::Route"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ApiKeyRequired: false
+            AuthorizationType: "NONE"
+            RouteKey: "ANY /locations"
+            Target: !Sub "integrations/${ApiGatewayV2Integration2}"
+
+    ApiGatewayV2Route3:
+        Type: "AWS::ApiGatewayV2::Route"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ApiKeyRequired: false
+            AuthorizationType: "NONE"
+            RouteKey: "ANY /forecast"
+            Target: !Sub "integrations/${ApiGatewayV2Integration3}"
+
+    ApiGatewayV2Integration:
+        Type: "AWS::ApiGatewayV2::Integration"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ConnectionType: "INTERNET"
+            IntegrationMethod: "POST"
+            IntegrationType: "AWS_PROXY"
+            IntegrationUri: !GetAtt LambdaFunction5.Arn
+            TimeoutInMillis: 30000
+            PayloadFormatVersion: "2.0"
+
+    ApiGatewayV2Integration2:
+        Type: "AWS::ApiGatewayV2::Integration"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ConnectionType: "INTERNET"
+            IntegrationMethod: "POST"
+            IntegrationType: "AWS_PROXY"
+            IntegrationUri: !GetAtt LambdaFunction2.Arn
+            TimeoutInMillis: 30000
+            PayloadFormatVersion: "2.0"
+
+    ApiGatewayV2Integration3:
+        Type: "AWS::ApiGatewayV2::Integration"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            ConnectionType: "INTERNET"
+            IntegrationMethod: "POST"
+            IntegrationType: "AWS_PROXY"
+            IntegrationUri: !GetAtt LambdaFunction3.Arn
+            TimeoutInMillis: 30000
+            PayloadFormatVersion: "1.0"
+
+    ApiGatewayV2ApiMapping:
+        Type: "AWS::ApiGatewayV2::ApiMapping"
+        Properties:
+            ApiId: !Ref ApiGatewayV2Api
+            DomainName: !Sub "${ApiGatewayV2Stage}.wettr.xyz"
+            Stage: !Ref ApiGatewayV2Stage
+            ApiMappingKey: ""
+
+    ApiGatewayDomainName:
+        Type: "AWS::ApiGateway::DomainName"
+        Properties:
+            DomainName: !Sub "${ApiGatewayV2Stage}.wettr.xyz"
+            EndpointConfiguration: 
+                Types: 
+                  - "REGIONAL"
+            RegionalCertificateArn: !Ref CertificateManagerCertificate
+            SecurityPolicy: "TLS_1_2"
+
+    DynamoDBTable:
+        Type: "AWS::DynamoDB::Table"
+        Properties:
+            AttributeDefinitions: 
+              - 
+                AttributeName: "date"
+                AttributeType: "S"
+              - 
+                AttributeName: "location"
+                AttributeType: "S"
+            TableName: "hyperweather_location_report_data"
+            KeySchema: 
+              - 
+                AttributeName: "location"
+                KeyType: "HASH"
+              - 
+                AttributeName: "date"
+                KeyType: "RANGE"
+            ProvisionedThroughput: 
+                ReadCapacityUnits: 5
+                WriteCapacityUnits: 5
+            StreamSpecification: 
+                StreamViewType: "NEW_IMAGE"
+
+    DynamoDBTable2:
+        Type: "AWS::DynamoDB::Table"
+        Properties:
+            AttributeDefinitions: 
+              - 
+                AttributeName: "location"
+                AttributeType: "S"
+              - 
+                AttributeName: "timestamp"
+                AttributeType: "N"
+            TableName: "hyperweather_data"
+            KeySchema: 
+              - 
+                AttributeName: "location"
+                KeyType: "HASH"
+              - 
+                AttributeName: "timestamp"
+                KeyType: "RANGE"
+            ProvisionedThroughput: 
+                ReadCapacityUnits: 5
+                WriteCapacityUnits: 5
+
+    EventsRule:
+        Type: "AWS::Events::Rule"
+        Properties:
+            Name: !Sub "${EventsRule2}AfterWeatherFetcher"
+            ScheduleExpression: "cron(10 3 * * ? *)"
+            State: "ENABLED"
+            Targets: 
+              - 
+                Arn: !GetAtt LambdaFunction6.Arn
+                Id: "t8npfbzmqmuib6y4lth"
+            EventBusName: "default"
+
+    EventsRule2:
+        Type: "AWS::Events::Rule"
+        Properties:
+            Name: "DailyOnce"
+            Description: "Once a day"
+            ScheduleExpression: "cron(0 3 * * ? *)"
+            State: "ENABLED"
+            Targets: 
+              - 
+                Arn: !GetAtt LambdaFunction.Arn
+                Id: "Ida942e1f0-3a3c-48fc-895a-960bb5739e4e"
+            EventBusName: "default"
+
+    EventsRule3:
+        Type: "AWS::Events::Rule"
+        Properties:
+            Name: "DailyTwice"
+            Description: "Cron expression to execute the lambda twice a day"
+            ScheduleExpression: "cron(0 10,16 * * ? *)"
+            State: "ENABLED"
+            EventBusName: "default"
+
+    CertificateManagerCertificate:
+        Type: "AWS::CertificateManager::Certificate"
+        Properties:
+            DomainName: "wettr.xyz"
+            SubjectAlternativeNames: 
+              - "wettr.xyz"
+              - !Ref S3Bucket
+              - !Sub "${ApiGatewayV2Stage}.wettr.xyz"
+            DomainValidationOptions: 
+              - 
+                DomainName: "wettr.xyz"
+                ValidationDomain: "wettr.xyz"
+              - 
+                DomainName: !Ref S3Bucket
+                ValidationDomain: !Ref S3Bucket
+              - 
+                DomainName: !Sub "${ApiGatewayV2Stage}.wettr.xyz"
+                ValidationDomain: !Sub "${ApiGatewayV2Stage}.wettr.xyz"
+            CertificateTransparencyLoggingPreference: "ENABLED"
+
+    IAMRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            RoleName: "ForecastAPI-role-i268ca59"
+            AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref IAMManagedPolicy7
+              - "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
+
+    IAMRole2:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            RoleName: "LocationsAPI-role-c1c9u1vn"
+            AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref IAMManagedPolicy2
+
+    IAMRole3:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            RoleName: "ForecastSummaryAPI-role-kbqdbdsa"
+            AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref IAMManagedPolicy5
+              - "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
+
+    IAMRole4:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            RoleName: "met_no_fetcher-role-8j1aloyp"
+            AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref IAMManagedPolicy6
+              - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+
+    IAMRole5:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            RoleName: "WeatherTTS-role-csc4butv"
+            AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref IAMManagedPolicy4
+              - "arn:aws:iam::aws:policy/AmazonPollyReadOnlyAccess"
+              - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+              - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+
+    IAMRole6:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            RoleName: "weather_ai-role-73vyjk53"
+            AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref IAMManagedPolicy
+              - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+
+    IAMManagedPolicy:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            ManagedPolicyName: "AWSLambdaBasicExecutionRole-ffdfe9b8-b719-493b-b0a0-eb11bcaec0bf"
+            Path: "/service-role/"
+            PolicyDocument: !Sub |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "logs:CreateLogGroup",
+                            "Resource": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": [
+                                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/weather_ai:*"
+                            ]
+                        }
+                    ]
+                }
+
+    IAMManagedPolicy2:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            ManagedPolicyName: "AWSLambdaBasicExecutionRole-72bb07bc-2faf-4cb4-a6ad-cca96118ccbb"
+            Path: "/service-role/"
+            PolicyDocument: !Sub |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "logs:CreateLogGroup",
+                            "Resource": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": [
+                                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/LocationsAPI:*"
+                            ]
+                        }
+                    ]
+                }
+
+    IAMManagedPolicy3:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            ManagedPolicyName: "AWSLambdaBasicExecutionRole-e54f2f7a-737a-45e0-916d-0aeb0fe249c3"
+            Path: "/service-role/"
+            PolicyDocument: !Sub |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "logs:CreateLogGroup",
+                            "Resource": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": [
+                                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/singing-gallery-${ApiGatewayV2Stage}:*"
+                            ]
+                        }
+                    ]
+                }
+
+    IAMManagedPolicy4:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            ManagedPolicyName: "AWSLambdaBasicExecutionRole-bade3882-5630-4bcf-ae90-0591a3222d5e"
+            Path: "/service-role/"
+            PolicyDocument: !Sub |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "logs:CreateLogGroup",
+                            "Resource": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": [
+                                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/WeatherTTS:*"
+                            ]
+                        }
+                    ]
+                }
+
+    IAMManagedPolicy5:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            ManagedPolicyName: "AWSLambdaBasicExecutionRole-0f3fc75d-252e-459a-8bfc-49670fc21576"
+            Path: "/service-role/"
+            PolicyDocument: !Sub |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "logs:CreateLogGroup",
+                            "Resource": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": [
+                                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/ForecastSummaryAPI:*"
+                            ]
+                        }
+                    ]
+                }
+
+    IAMManagedPolicy6:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            ManagedPolicyName: "AWSLambdaBasicExecutionRole-d215d687-1eb6-408b-b725-74fd6c73c98b"
+            Path: "/service-role/"
+            PolicyDocument: !Sub |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "logs:CreateLogGroup",
+                            "Resource": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": [
+                                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/met_no_fetcher:*"
+                            ]
+                        }
+                    ]
+                }
+
+    IAMManagedPolicy7:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            ManagedPolicyName: "AWSLambdaBasicExecutionRole-a812e467-3339-4e30-bbeb-99db029290e7"
+            Path: "/service-role/"
+            PolicyDocument: !Sub |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": "logs:CreateLogGroup",
+                            "Resource": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": [
+                                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/ForecastAPI:*"
+                            ]
+                        }
+                    ]
+                }
+
+    IAMPolicy:
+        Type: "AWS::IAM::Policy"
+        Properties:
+            PolicyDocument: !Sub |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "VisualEditor0",
+                            "Effect": "Allow",
+                            "Action": "s3:GetObject",
+                            "Resource": "arn:aws:s3:::${S3Bucket2}/*"
+                        }
+                    ]
+                }
+            Roles: 
+              - !Sub "${LambdaFunction5}-role-kbqdbdsa"
+            PolicyName: !Sub "${S3Bucket2}-bucket-read"
+
