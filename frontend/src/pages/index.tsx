@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useState, useEffect, Key, SetStateAction, useRef } from "react";
-import { formatWeatherData } from "../utils/weather_data_utils";
+import { formatWeatherData } from "@/utils/weather_data_utils";
 import styles from '../styles/Weather.module.css'
 
 
@@ -10,7 +10,7 @@ const WETTR_API_URL = "https://api.wettr.xyz"
 function CustomPopup({ popupClose, popupTitle, popupShow, popupChildern }: { popupClose: Function, popupTitle: string, popupShow: boolean, popupChildern: any }) {
     const [show, setShow] = useState(false);
 
-    const closeHandler = (e: any) => {
+    const closeHandler = () => {
         setShow(false);
         popupClose(false);
     };
@@ -36,7 +36,7 @@ function CustomPopup({ popupClose, popupTitle, popupShow, popupChildern }: { pop
             </div>
         </div>
     );
-};
+}
 
 
 function PlayAndVisualizeAudio({ audioUrl }: { audioUrl: string }) {
