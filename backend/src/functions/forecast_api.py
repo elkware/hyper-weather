@@ -16,7 +16,7 @@ class DecimalEncoder(json.JSONEncoder):
         if isinstance(obj, Iterable) and (not isinstance(obj, str)):
             return "[" + ", ".join(map(self.encode, obj)) + "]"
         if isinstance(obj, Decimal):
-            return f"{obj.normalize():f}"  # using normalize() gets rid of trailing 0s, using ':f' prevents scientific notation
+            return f"{obj.normalize():f}"
         return super().encode(obj)
 
 

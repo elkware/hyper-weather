@@ -4,7 +4,6 @@ import json
 from datetime import datetime
 from decimal import Decimal
 
-
 http = urllib3.PoolManager()
 
 
@@ -22,14 +21,15 @@ def retrieve_weather_data():
     Retrieve the weather data from the met.no api and format it for dynamodb.
 
     Returns:
-        list: A genertor of weather data items per city
+        A generator of weather data items per city
     """
     for city in json.load(open("supported_cities.json", "r")):
         try:
             data = json.loads(
                 http.request(
                     method="GET",
-                    url=f'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={city["lat"]}&lon={city["lon"]}',
+                    url="https://api.met.no/weatherapi/locationforecast/2.0/compact"
+                    f'?lat={city["lat"]}&lon={city["lon"]}',
                     headers={"User-Agent": "HyperWeather/0.1 github.com/elkware/hyper-weather"},
                 ).data.decode("utf-8"),
                 parse_float=Decimal,

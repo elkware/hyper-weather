@@ -22,12 +22,11 @@ def call_polly_and_save_to_s3(location, date, text):
 
 def lambda_handler(event, context):
     """
-    Lambdd to handle the stream from dynamo db.
+    Lambda to handle the stream from dynamo db.
     """
     for record in event["Records"]:
         if record["eventName"] == "INSERT":
             new_image = record["dynamodb"]["NewImage"]
-            print(new_image)
             location = new_image["location"]["S"]
             date = new_image["date"]["S"]
             report = new_image["report"]["S"]
