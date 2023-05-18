@@ -7,11 +7,11 @@ import styles from '../styles/Weather.module.css'
 
 const WETTR_API_URL = "https://api.wettr.xyz"
 
-function CustomPopup({popupClose, popupTitle, popupShow, popupChildern}: {
+function CustomPopup({popupClose, popupTitle, popupShow, popupChildren}: {
     popupClose: Function,
     popupTitle: string,
     popupShow: boolean,
-    popupChildern: any
+    popupChildren: any
 }) {
     const [show, setShow] = useState(false);
 
@@ -37,7 +37,7 @@ function CustomPopup({popupClose, popupTitle, popupShow, popupChildern}: {
                 <span className={styles.close} onClick={closeHandler}>
                     &times;
                 </span>
-                <div className={styles.content}>{popupChildern}</div>
+                <div className={styles.content}>{popupChildren}</div>
             </div>
         </div>
     );
@@ -327,17 +327,18 @@ function Navs() {
                     popupClose={popupCloseHandler}
                     popupShow={visibility}
                     popupTitle="About Wettr"
-                    popupChildern={
+                    popupChildren={
                         <div>
-                            <p>Demo app to demostrate various services and features of AWS. The weather data comes from
+                            <p>Wettr - weather forcast, AI enhanced!</p>
+                            <p>A demo application to demonstrate various services and features of AWS. The weather data comes from
                                 Norwegian Meteorological Institute and the daily summaries are generated using
                                 OpenAI.</p>
                             <p>The frontend is hosted on S3 and uses CloudFront as a CDN.</p>
                             <p>API Gateway and Lambda is used to expose the API to the internet.</p>
                             <p>Route 53 is used to route the domain name to the frontend and backend.</p>
                             <p>CloudWatch is used to monitor the health of the API.</p>
-                            <p>Dynammo DB is used to store the forecast data.</p>
-                            <p>Polly is uesed to voice the weather summary text.</p>
+                            <p>DynamoDB is used to store the forecast data.</p>
+                            <p>Polly is used to voice the weather summary text.</p>
                             <p>The frontend is written in TypeScript and uses React, Next.js and PicoCSS. The backend is
                                 written in Python. The code can be found on <a
                                     href="https://github.com/elkware/wettr.xyz" target="_blank">github</a>.</p>
